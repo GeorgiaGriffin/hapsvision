@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haptic Nav - Dev Mode</title>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background: #f4f4f9; }
+        .card { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { color: #333; font-size: 1.5rem; text-align: center; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: opacity 0.2s; }
+        .btn-primary { background: #007AFF; color: white; }
+        input { width: 100%; padding: 14px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        #instruction-box { 
+            margin-top: 25px; padding: 20px; border-left: 5px solid #007AFF; 
+            background: #eef7ff; border-radius: 4px; min-height: 60px;
+        }
+        .status-tag { display: inline-block; padding: 4px 10px; background: #e0e0e0; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <span class="status-tag">Dev Mode: Bluetooth Mocked</span>
+    <h1>Haptic Navigator</h1>
+
+    <label for="destination" class="sr-only">Enter destination</label>
+    <input type="text" id="destination" placeholder="Where to? (e.g. Cafe Du Monde)">
+    
+    <button id="startNav" class="btn btn-primary" aria-label="Start Navigation">Start Navigation</button>
+
+    <div id="instruction-box" aria-live="assertive" role="alert">
+        Enter a destination and press Start.
+    </div>
+</div>
+
+<script>
+    // 1. DYNAMIC API LOADING
+    const urlParams = new URLSearchParams(window.location.search);
+    const apiKey = urlParams.get('key');
+
+    if (apiKey) {
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initApp`;
+        script.defer = true;
+        document.head.appendChild(script);
+    } else {
+        document.getElementById('instruction-box').innerHTML = "<span style='color:red'>Missing API Key! Add ?key=YOUR_KEY to the URL.</span>";
+    }
+
+    // 2. MOCK BLUETOOTH FUNCTION
+    // When you're ready to use the ESP32, you'll swap this back to bleChar.writeValue()
+    function sendToWristband(command) {
+        const labels = ["STRAIGHT (0x00)", "LEFT (0x01)", "RIGHT (0x02)"];
+        console.log(`%c[Bluetooth Send] %c${labels[command]}`, "color: #007AFF; font-weight: bold", "color: #333");
+    }
+
+    // 3. APP LOGIC
+    function initApp() {
+        const directionsService = new google.maps.DirectionsService();
+        // Setup autocomplete for the input field
+        const autocomplete = new google.maps.places.Autocomplete(document.getElementById('destination'));
+
+        document.getElementById('startNav').onclick = () => {
+            const destination = document.getElementById('destination').value;
+            if (!destination) return alert("Please enter a destination");
+
+            navigator.geolocation.getCurrentPosition(pos => {
+                const request = {
+                    origin: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+                    destination: destination,
+                    travelMode: 'WALKING'
+                };
+
+                directionsService.route(request, (result, status) => {
+                    if (status === 'OK') {
+                        runNavigationDemo(result.routes[0].legs[0].steps);
+                    } else {
+                        alert("Could not find route: " + status);
+                    }
+                });
+            }, err => alert("Please enable Location Services"));
+        };
+    }
+
+    function runNavigationDemo(steps) {
+        let i = 0;
+        const display = document.getElementById('instruction-box');
+
+        const processStep = () => {
+            if (i >= steps.length) {
+                display.innerText = "Arrival! You have reached your destination.";
+                return;
+            }
+
+            const step = steps[i];
+            // 1. Clean the text (Google provides <b>Turn right</b> onto <b>Canal St</b>)
+            const cleanText = step.instructions.replace(/<[^>]*>?/gm, '');
+            const distanceText = step.distance.text; // e.g., "0.2 mi" or "100 ft"
+            const maneuver = step.maneuver || "";
+
+            // PHASE 1: THE WARNING (Screen reader will announce this immediately)
+            display.innerText = `In ${distanceText}, ${cleanText}`;
+            console.log(`%c[Warning] In ${distanceText}, ${cleanText}`, "color: #f39c12");
+
+            // PHASE 2: THE ACTION (Triggered after a delay to simulate movement)
+            // In a real app, this would trigger when GPS distance < 20 meters
+            setTimeout(() => {
+                display.innerText = `NOW: ${cleanText}`;
+                
+                // Determine Bluetooth Command
+                let cmd = 0x00; // Straight
+                if (maneuver.includes("left")) cmd = 0x01;
+                else if (maneuver.includes("right")) cmd = 0x02;
+
+                sendToWristband(cmd);
+                
+                i++;
+                // Wait a bit before starting the NEXT step's warning
+                setTimeout(processStep, 4000); 
+                
+            }, 5000); // 5 seconds of "walking" between warning and action
+        };
+
+        processStep();
+    }
+</script>
+
+</body>
+</html>
