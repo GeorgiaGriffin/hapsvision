@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haptic Nav - Event Driven</title>
+    <title>Haptic Nav - Pro Calibration</title>
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background: #f4f4f9; color: #333; }
         .card { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         h1 { font-size: 1.5rem; text-align: center; margin: 0 0 20px 0; }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; transition: background 0.2s; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
         .btn-primary { background: #007AFF; color: white; }
         .btn-bluetooth { background: #5856D6; color: white; }
-        /* Toggle Styles */
         .btn-mock-off { background: #e0e0e0; color: #666; border: 2px solid #ccc; }
         .btn-mock-on { background: #FFF3E0; color: #E65100; border: 2px solid #FF9500; }
         .btn-trigger { background: #FF9500; color: white; display: none; margin-top: 20px; }
-        
-        input { width: 100%; padding: 14px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        input { width: 100%; padding: 14px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         #instruction-box { 
             margin-top: 25px; padding: 20px; border-left: 5px solid #007AFF; 
             background: #eef7ff; border-radius: 8px; min-height: 100px; font-weight: bold; font-size: 1.4rem;
@@ -36,17 +34,16 @@
     
     <h1>Haptic Nav</h1>
 
-    <label for="destination" class="sr-only" style="display:none;">Destination</label>
     <input type="text" id="destination" placeholder="Enter destination...">
     
     <button id="connectBle" class="btn btn-bluetooth">1. Connect Wristband</button>
-    <button id="startNav" class="btn btn-primary">2. Start Navigation</button>
+    <button id="startNav" class="btn btn-primary">2. Start directions</button>
     
     <button id="toggleMock" class="btn btn-mock-off">Mock Mode: OFF</button>
     <button id="completeStepBtn" class="btn btn-trigger">Simulate Turn Completion</button>
 
     <div id="instruction-box" aria-live="assertive" role="alert">
-        Connect BLE and enter destination to begin.
+        Connect device, then start directions
     </div>
 </div>
 
@@ -56,11 +53,11 @@
     let stepIndex = 0;
     let isActionPhase = false;
     let bleChar = null;
+    let currentPhoneHeading = 0;
 
     const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb"; 
     const CHAR_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
 
-    // 1. DYNAMIC API LOADING
     const urlParams = new URLSearchParams(window.location.search);
     const apiKey = urlParams.get('key');
 
@@ -69,75 +66,64 @@
         script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initApp`;
         script.defer = true;
         document.head.appendChild(script);
-    } else {
-        document.getElementById('instruction-box').innerHTML = "<span style='color:red'>Add ?key=YOUR_KEY to the URL</span>";
     }
 
-    // 2. BLUETOOTH HANDLING
-    document.getElementById('connectBle').onclick = async () => {
-        if (isMockMode) {
-            alert("Turn off Mock Mode to connect real hardware.");
-            return;
+    // --- COMPASS PERMISSIONS (iOS Requirement) ---
+    async function requestCompass() {
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            const response = await DeviceOrientationEvent.requestPermission();
+            if (response === 'granted') {
+                window.addEventListener('deviceorientationabsolute', updateHeading, true);
+                window.addEventListener('deviceorientation', updateHeading, true);
+            }
+        } else {
+            window.addEventListener('deviceorientation', updateHeading, true);
         }
+    }
+
+    function updateHeading(e) {
+        // webkitCompassHeading is the most accurate for iOS
+        currentPhoneHeading = e.webkitCompassHeading || (360 - e.alpha);
+    }
+
+    // --- BLUETOOTH ---
+    document.getElementById('connectBle').onclick = async () => {
         try {
-            const device = await navigator.bluetooth.requestDevice({
-                filters: [{ services: [SERVICE_UUID] }]
-            });
+            const device = await navigator.bluetooth.requestDevice({ filters: [{ services: [SERVICE_UUID] }] });
             const server = await device.gatt.connect();
             const service = await server.getPrimaryService(SERVICE_UUID);
             bleChar = await service.getCharacteristic(CHAR_UUID);
-
             await bleChar.startNotifications();
             bleChar.addEventListener('characteristicvaluechanged', (e) => {
-                const val = new Uint8Array(e.target.value.buffer)[0];
-                if (val === 0x04) completeTurnLogic();
+                if (new Uint8Array(e.target.value.buffer)[0] === 0x04) completeTurnLogic();
             });
-
-            const status = document.getElementById('ble-status');
-            status.innerText = "BLE: Connected ✅";
-            status.classList.add('status-active');
-        } catch (err) {
-            console.error("BLE Error:", err);
-        }
+            document.getElementById('ble-status').innerText = "BLE: Connected ✅";
+            document.getElementById('ble-status').classList.add('status-active');
+        } catch (err) { console.error(err); }
     };
 
     function sendToWristband(command) {
-        if (!isMockMode && bleChar) {
-            bleChar.writeValue(new Uint8Array([command]));
-        }
-        const labels = ["FORWARD", "LEFT", "RIGHT"];
-        console.log(`[HAPTIC SEND] ${labels[command]}`);
+        if (!isMockMode && bleChar) bleChar.writeValue(new Uint8Array([command]));
+        console.log(`[OUT] Command: ${command}`);
     }
 
-    // 3. NAVIGATION CORE
+    // --- NAVIGATION LOGIC ---
     function initApp() {
-        // Destination Autofill (Google Places Autocomplete)
         const autocomplete = new google.maps.places.Autocomplete(document.getElementById('destination'));
         const directionsService = new google.maps.DirectionsService();
 
-        // Mock Mode Toggle
         document.getElementById('toggleMock').onclick = function() {
             isMockMode = !isMockMode;
-            if (isMockMode) {
-                this.innerText = "Mock Mode: ON";
-                this.className = "btn btn-mock-on";
-                document.getElementById('mode-status').innerText = "Mode: Mocked";
-                document.getElementById('mode-status').classList.add('status-active');
-                document.getElementById('completeStepBtn').style.display = "block";
-                document.getElementById('ble-status').innerText = "BLE: Bypassed";
-            } else {
-                this.innerText = "Mock Mode: OFF";
-                this.className = "btn btn-mock-off";
-                document.getElementById('mode-status').innerText = "Mode: Live GPS";
-                document.getElementById('mode-status').classList.remove('status-active');
-                document.getElementById('completeStepBtn').style.display = "none";
-                document.getElementById('ble-status').innerText = "BLE: Disconnected";
-            }
+            this.innerText = isMockMode ? "Mock Mode: ON" : "Mock Mode: OFF";
+            this.className = isMockMode ? "btn btn-mock-on" : "btn btn-mock-off";
+            document.getElementById('completeStepBtn').style.display = isMockMode ? "block" : "none";
         };
 
-        document.getElementById('startNav').onclick = () => {
+        document.getElementById('startNav').onclick = async () => {
             const dest = document.getElementById('destination').value;
-            if (!dest) return alert("Please enter a destination");
+            if (!dest) return alert("Enter destination");
+
+            await requestCompass(); // Ask for compass access
 
             navigator.geolocation.getCurrentPosition(pos => {
                 directionsService.route({
@@ -149,47 +135,79 @@
                         globalSteps = result.routes[0].legs[0].steps;
                         stepIndex = 0;
                         isActionPhase = false;
-                        if (!isMockMode) startLiveTracking();
-                        else triggerTurnSequence(); 
+                        getStartDirection(); // Step 0: Face the right way
                     }
                 });
             });
         };
 
-        // This button simulates the 0x04 feedback from the ESP32
-        document.getElementById('completeStepBtn').onclick = () => {
-            if (isActionPhase) {
-                completeTurnLogic();
-            } else {
-                // If we aren't in a turn, move the GPS simulation forward
-                triggerTurnSequence();
-            }
-        };
+        document.getElementById('completeStepBtn').onclick = () => { if (isActionPhase) completeTurnLogic(); };
+    }
+
+    // --- CALIBRATION STEP ---
+    function getStartDirection() {
+        isActionPhase = true;
+        const firstStep = globalSteps[0];
+        
+        // Calculate bearing from origin to first step end location
+        const startLat = firstStep.start_location.lat();
+        const startLng = firstStep.start_location.lng();
+        const endLat = firstStep.end_location.lat();
+        const endLng = firstStep.end_location.lng();
+
+        // Target Bearing (0 = North, 90 = East, etc.)
+        const targetBearing = calculateBearing(startLat, startLng, endLat, endLng);
+        const cardinal = getCardinal(targetBearing);
+
+        // Calculate Relative Turn
+        // Difference between where I'm facing and where I need to face
+        let diff = targetBearing - currentPhoneHeading;
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+
+        let turnDir = diff > 0 ? "right" : "left";
+        let cmd = diff > 0 ? 0x02 : 0x01;
+
+        updateDisplay(`Turn ${turnDir} to face ${cardinal}`);
+        sendToWristband(cmd);
+        
+        // App now waits for 0x04 from ESP32 (MPU-6050 turn complete)
     }
 
     function triggerTurnSequence() {
         if (stepIndex >= globalSteps.length || isActionPhase) return;
-
         isActionPhase = true;
         const step = globalSteps[stepIndex];
         const instruction = step.instructions.replace(/<[^>]*>?/gm, '');
-
         updateDisplay(instruction);
         
         let cmd = 0x00;
         const lowerText = instruction.toLowerCase();
         if (lowerText.includes("left")) cmd = 0x01;
         else if (lowerText.includes("right")) cmd = 0x02;
-        
         sendToWristband(cmd);
-        // Note: No timer. Only completeTurnLogic() advances the state.
     }
 
     function completeTurnLogic() {
         if (!isActionPhase) return;
-        
-        console.log("[HAPTIC RECV] Feedback: Turn Finished");
         isActionPhase = false;
+
+        // CHECK: Did we just finish the "Face [Cardinal]" calibration step?
+        if (document.getElementById('instruction-box').innerText.includes("face")) {
+            console.log("Calibration complete. Transitioning to path...");
+            
+            if (isMockMode) {
+                // In Mock Mode, we manually trigger the first turn in the directions list
+                triggerTurnSequence(); 
+            } else {
+                // In Live Mode, we show "Ready" and let the GPS take over.
+                updateDisplay("Facing correctly. Start walking!");
+                startLiveTracking();
+            }
+            return; // Exit here so we don't increment stepIndex yet
+        }
+
+        // REGULAR TURN LOGIC: Move to the next step in the directions array
         stepIndex++;
         
         if (stepIndex < globalSteps.length) {
@@ -201,34 +219,37 @@
         }
     }
 
+    // --- MATH UTILITIES ---
+    function calculateBearing(lat1, lng1, lat2, lng2) {
+        const dLon = (lng2 - lng1) * Math.PI / 180;
+        const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
+        const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
+                  Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon);
+        return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    }
+
+    function getCardinal(angle) {
+        const directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+        return directions[Math.round(angle / 45) % 8];
+    }
+
     function startLiveTracking() {
         navigator.geolocation.watchPosition((position) => {
             if (isMockMode || stepIndex >= globalSteps.length || isActionPhase) return;
-
             const step = globalSteps[stepIndex];
-            const distance = getDistance(
-                position.coords.latitude, position.coords.longitude,
-                step.end_location.lat(), step.end_location.lng()
-            );
-
-            if (distance <= 12) {
-                triggerTurnSequence();
-            } else {
-                updateDisplay("Continue forward");
-            }
+            const dist = getDistance(position.coords.latitude, position.coords.longitude, step.end_location.lat(), step.end_location.lng());
+            if (dist <= 12) triggerTurnSequence();
+            else updateDisplay("Continue forward");
         }, null, { enableHighAccuracy: true });
     }
 
-    function updateDisplay(text) {
-        document.getElementById('instruction-box').innerText = text;
-    }
-
+    function updateDisplay(text) { document.getElementById('instruction-box').innerText = text; }
+    
     function getDistance(lat1, lon1, lat2, lon2) {
         const R = 6371e3; 
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
     }
 </script>
