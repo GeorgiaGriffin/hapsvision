@@ -87,7 +87,7 @@
     // --- BLUETOOTH ---
     document.getElementById('connectBle').onclick = async () => {
         try {
-            const device = await navigator.bluetooth.requestDevice({ filters: [{ services: [SERVICE_UUID] }] });
+            const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: [SERVICE_UUID] });
             const server = await device.gatt.connect();
             const service = await server.getPrimaryService(SERVICE_UUID);
             bleChar = await service.getCharacteristic(CHAR_UUID);
