@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haptic Nav - Pro Calibration</title>
+    <title>Haptic Nav - Hardware Bypass</title>
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background: #f4f4f9; color: #333; }
         .card { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
@@ -33,17 +33,16 @@
     </div>
     
     <h1>Haptic Nav</h1>
-
     <input type="text" id="destination" placeholder="Enter destination...">
     
     <button id="connectBle" class="btn btn-bluetooth">1. Connect Wristband</button>
-    <button id="startNav" class="btn btn-primary">2. Start directions</button>
+    <button id="startNav" class="btn btn-primary">2. Start & Calibrate</button>
     
     <button id="toggleMock" class="btn btn-mock-off">Mock Mode: OFF</button>
     <button id="completeStepBtn" class="btn btn-trigger">Simulate Turn Completion</button>
 
     <div id="instruction-box" aria-live="assertive" role="alert">
-        Connect device, then start directions
+        Connect BLE, then Start to calibrate.
     </div>
 </div>
 
@@ -68,7 +67,7 @@
         document.head.appendChild(script);
     }
 
-    // --- COMPASS PERMISSIONS (iOS Requirement) ---
+    // --- COMPASS PERMISSIONS ---
     async function requestCompass() {
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
             const response = await DeviceOrientationEvent.requestPermission();
@@ -82,7 +81,6 @@
     }
 
     function updateHeading(e) {
-        // webkitCompassHeading is the most accurate for iOS
         currentPhoneHeading = e.webkitCompassHeading || (360 - e.alpha);
     }
 
@@ -93,10 +91,15 @@
             const server = await device.gatt.connect();
             const service = await server.getPrimaryService(SERVICE_UUID);
             bleChar = await service.getCharacteristic(CHAR_UUID);
+            
+            // NOTE: Hardware notification listener kept for future use
+            /*
             await bleChar.startNotifications();
             bleChar.addEventListener('characteristicvaluechanged', (e) => {
                 if (new Uint8Array(e.target.value.buffer)[0] === 0x04) completeTurnLogic();
             });
+            */
+            
             document.getElementById('ble-status').innerText = "BLE: Connected ✅";
             document.getElementById('ble-status').classList.add('status-active');
         } catch (err) { console.error(err); }
@@ -109,7 +112,7 @@
 
     // --- NAVIGATION LOGIC ---
     function initApp() {
-        const autocomplete = new google.maps.places.Autocomplete(document.getElementById('destination'));
+        new google.maps.places.Autocomplete(document.getElementById('destination'));
         const directionsService = new google.maps.DirectionsService();
 
         document.getElementById('toggleMock').onclick = function() {
@@ -122,9 +125,7 @@
         document.getElementById('startNav').onclick = async () => {
             const dest = document.getElementById('destination').value;
             if (!dest) return alert("Enter destination");
-
-            await requestCompass(); // Ask for compass access
-
+            await requestCompass(); 
             navigator.geolocation.getCurrentPosition(pos => {
                 directionsService.route({
                     origin: { lat: pos.coords.latitude, lng: pos.coords.longitude },
@@ -135,7 +136,7 @@
                         globalSteps = result.routes[0].legs[0].steps;
                         stepIndex = 0;
                         isActionPhase = false;
-                        getStartDirection(); // Step 0: Face the right way
+                        getStartDirection(); 
                     }
                 });
             });
@@ -144,34 +145,26 @@
         document.getElementById('completeStepBtn').onclick = () => { if (isActionPhase) completeTurnLogic(); };
     }
 
-    // --- CALIBRATION STEP ---
+    // --- CALIBRATION ---
     function getStartDirection() {
         isActionPhase = true;
         const firstStep = globalSteps[0];
-        
-        // Calculate bearing from origin to first step end location
-        const startLat = firstStep.start_location.lat();
-        const startLng = firstStep.start_location.lng();
-        const endLat = firstStep.end_location.lat();
-        const endLng = firstStep.end_location.lng();
-
-        // Target Bearing (0 = North, 90 = East, etc.)
-        const targetBearing = calculateBearing(startLat, startLng, endLat, endLng);
+        const targetBearing = calculateBearing(
+            firstStep.start_location.lat(), firstStep.start_location.lng(), 
+            firstStep.end_location.lat(), firstStep.end_location.lng()
+        );
         const cardinal = getCardinal(targetBearing);
 
-        // Calculate Relative Turn
-        // Difference between where I'm facing and where I need to face
         let diff = targetBearing - currentPhoneHeading;
         if (diff > 180) diff -= 360;
         if (diff < -180) diff += 360;
 
         let turnDir = diff > 0 ? "right" : "left";
-        let cmd = diff > 0 ? 0x02 : 0x01;
-
         updateDisplay(`Turn ${turnDir} to face ${cardinal}`);
-        sendToWristband(cmd);
+        sendToWristband(diff > 0 ? 0x02 : 0x01);
         
-        // App now waits for 0x04 from ESP32 (MPU-6050 turn complete)
+        // AUTO-BYPASS MPU: Assuming user turns within 3 seconds
+        setTimeout(() => { if(isActionPhase) completeTurnLogic(); }, 3000);
     }
 
     function triggerTurnSequence() {
@@ -186,36 +179,37 @@
         if (lowerText.includes("left")) cmd = 0x01;
         else if (lowerText.includes("right")) cmd = 0x02;
         sendToWristband(cmd);
+
+        // AUTO-BYPASS MPU: Assuming turn is made within 3 seconds
+        setTimeout(() => { if(isActionPhase) completeTurnLogic(); }, 3000);
     }
 
     function completeTurnLogic() {
         if (!isActionPhase) return;
-        isActionPhase = false;
-
-        // CHECK: Did we just finish the "Face [Cardinal]" calibration step?
+        
+        // CHECK: If we just finished Calibration
         if (document.getElementById('instruction-box').innerText.includes("face")) {
-            console.log("Calibration complete. Transitioning to path...");
+            isActionPhase = false;
+            console.log("Calibration Bypassed/Completed.");
             
             if (isMockMode) {
-                // In Mock Mode, we manually trigger the first turn in the directions list
-                triggerTurnSequence(); 
+                triggerTurnSequence(); // Auto-start first step in Mock
             } else {
-                // In Live Mode, we show "Ready" and let the GPS take over.
                 updateDisplay("Facing correctly. Start walking!");
-                startLiveTracking();
+                startLiveTracking(); // Start GPS in Live
             }
-            return; // Exit here so we don't increment stepIndex yet
+            return;
         }
 
-        // REGULAR TURN LOGIC: Move to the next step in the directions array
+        // REGULAR TURN TRANSITION
+        isActionPhase = false;
         stepIndex++;
         
         if (stepIndex < globalSteps.length) {
             updateDisplay("Continue forward");
             sendToWristband(0x00);
         } else {
-            updateDisplay("Arrived at destination");
-            sendToWristband(0x00);
+            updateDisplay("Arrived!");
         }
     }
 
