@@ -3,38 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haptic Nav - Dev Mode</title>
+    <title>Haptic Nav - Event Driven</title>
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background: #f4f4f9; }
+        body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background: #f4f4f9; color: #333; }
         .card { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { color: #333; font-size: 1.5rem; text-align: center; }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: opacity 0.2s; }
+        h1 { font-size: 1.5rem; text-align: center; margin: 0 0 20px 0; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; transition: background 0.2s; }
         .btn-primary { background: #007AFF; color: white; }
+        .btn-bluetooth { background: #5856D6; color: white; }
+        /* Toggle Styles */
+        .btn-mock-off { background: #e0e0e0; color: #666; border: 2px solid #ccc; }
+        .btn-mock-on { background: #FFF3E0; color: #E65100; border: 2px solid #FF9500; }
+        .btn-trigger { background: #FF9500; color: white; display: none; margin-top: 20px; }
+        
         input { width: 100%; padding: 14px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         #instruction-box { 
             margin-top: 25px; padding: 20px; border-left: 5px solid #007AFF; 
-            background: #eef7ff; border-radius: 4px; min-height: 60px;
+            background: #eef7ff; border-radius: 8px; min-height: 100px; font-weight: bold; font-size: 1.4rem;
+            display: flex; align-items: center; justify-content: center; text-align: center;
         }
-        .status-tag { display: inline-block; padding: 4px 10px; background: #e0e0e0; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; }
+        .status-tag { display: inline-block; padding: 4px 10px; background: #e0e0e0; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; margin-right: 5px; }
+        .status-active { background: #d1fad7; color: #1e7d32; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <span class="status-tag">Dev Mode: Bluetooth Mocked</span>
-    <h1>Haptic Navigator</h1>
-
-    <label for="destination" class="sr-only">Enter destination</label>
-    <input type="text" id="destination" placeholder="Where to? (e.g. Cafe Du Monde)">
+    <div style="text-align: center;">
+        <span class="status-tag" id="mode-status">Mode: Live GPS</span>
+        <span class="status-tag" id="ble-status">BLE: Disconnected</span>
+    </div>
     
-    <button id="startNav" class="btn btn-primary" aria-label="Start Navigation">Start Navigation</button>
+    <h1>Haptic Nav</h1>
+
+    <label for="destination" class="sr-only" style="display:none;">Destination</label>
+    <input type="text" id="destination" placeholder="Enter destination...">
+    
+    <button id="connectBle" class="btn btn-bluetooth">1. Connect Wristband</button>
+    <button id="startNav" class="btn btn-primary">2. Start Navigation</button>
+    
+    <button id="toggleMock" class="btn btn-mock-off">Mock Mode: OFF</button>
+    <button id="completeStepBtn" class="btn btn-trigger">Simulate Turn Completion</button>
 
     <div id="instruction-box" aria-live="assertive" role="alert">
-        Enter a destination and press Start.
+        Connect BLE and enter destination to begin.
     </div>
 </div>
 
 <script>
+    let isMockMode = false;
+    let globalSteps = [];
+    let stepIndex = 0;
+    let isActionPhase = false;
+    let bleChar = null;
+
+    const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb"; 
+    const CHAR_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
     // 1. DYNAMIC API LOADING
     const urlParams = new URLSearchParams(window.location.search);
     const apiKey = urlParams.get('key');
@@ -45,86 +70,167 @@
         script.defer = true;
         document.head.appendChild(script);
     } else {
-        document.getElementById('instruction-box').innerHTML = "<span style='color:red'>Missing API Key! Add ?key=YOUR_KEY to the URL.</span>";
+        document.getElementById('instruction-box').innerHTML = "<span style='color:red'>Add ?key=YOUR_KEY to the URL</span>";
     }
 
-    // 2. MOCK BLUETOOTH FUNCTION
-    // When you're ready to use the ESP32, you'll swap this back to bleChar.writeValue()
+    // 2. BLUETOOTH HANDLING
+    document.getElementById('connectBle').onclick = async () => {
+        if (isMockMode) {
+            alert("Turn off Mock Mode to connect real hardware.");
+            return;
+        }
+        try {
+            const device = await navigator.bluetooth.requestDevice({
+                filters: [{ services: [SERVICE_UUID] }]
+            });
+            const server = await device.gatt.connect();
+            const service = await server.getPrimaryService(SERVICE_UUID);
+            bleChar = await service.getCharacteristic(CHAR_UUID);
+
+            await bleChar.startNotifications();
+            bleChar.addEventListener('characteristicvaluechanged', (e) => {
+                const val = new Uint8Array(e.target.value.buffer)[0];
+                if (val === 0x04) completeTurnLogic();
+            });
+
+            const status = document.getElementById('ble-status');
+            status.innerText = "BLE: Connected ✅";
+            status.classList.add('status-active');
+        } catch (err) {
+            console.error("BLE Error:", err);
+        }
+    };
+
     function sendToWristband(command) {
-        const labels = ["STRAIGHT (0x00)", "LEFT (0x01)", "RIGHT (0x02)"];
-        console.log(`%c[Bluetooth Send] %c${labels[command]}`, "color: #007AFF; font-weight: bold", "color: #333");
+        if (!isMockMode && bleChar) {
+            bleChar.writeValue(new Uint8Array([command]));
+        }
+        const labels = ["FORWARD", "LEFT", "RIGHT"];
+        console.log(`[HAPTIC SEND] ${labels[command]}`);
     }
 
-    // 3. APP LOGIC
+    // 3. NAVIGATION CORE
     function initApp() {
-        const directionsService = new google.maps.DirectionsService();
-        // Setup autocomplete for the input field
+        // Destination Autofill (Google Places Autocomplete)
         const autocomplete = new google.maps.places.Autocomplete(document.getElementById('destination'));
+        const directionsService = new google.maps.DirectionsService();
+
+        // Mock Mode Toggle
+        document.getElementById('toggleMock').onclick = function() {
+            isMockMode = !isMockMode;
+            if (isMockMode) {
+                this.innerText = "Mock Mode: ON";
+                this.className = "btn btn-mock-on";
+                document.getElementById('mode-status').innerText = "Mode: Mocked";
+                document.getElementById('mode-status').classList.add('status-active');
+                document.getElementById('completeStepBtn').style.display = "block";
+                document.getElementById('ble-status').innerText = "BLE: Bypassed";
+            } else {
+                this.innerText = "Mock Mode: OFF";
+                this.className = "btn btn-mock-off";
+                document.getElementById('mode-status').innerText = "Mode: Live GPS";
+                document.getElementById('mode-status').classList.remove('status-active');
+                document.getElementById('completeStepBtn').style.display = "none";
+                document.getElementById('ble-status').innerText = "BLE: Disconnected";
+            }
+        };
 
         document.getElementById('startNav').onclick = () => {
-            const destination = document.getElementById('destination').value;
-            if (!destination) return alert("Please enter a destination");
+            const dest = document.getElementById('destination').value;
+            if (!dest) return alert("Please enter a destination");
 
             navigator.geolocation.getCurrentPosition(pos => {
-                const request = {
+                directionsService.route({
                     origin: { lat: pos.coords.latitude, lng: pos.coords.longitude },
-                    destination: destination,
+                    destination: dest,
                     travelMode: 'WALKING'
-                };
-
-                directionsService.route(request, (result, status) => {
+                }, (result, status) => {
                     if (status === 'OK') {
-                        runNavigationDemo(result.routes[0].legs[0].steps);
-                    } else {
-                        alert("Could not find route: " + status);
+                        globalSteps = result.routes[0].legs[0].steps;
+                        stepIndex = 0;
+                        isActionPhase = false;
+                        if (!isMockMode) startLiveTracking();
+                        else triggerTurnSequence(); 
                     }
                 });
-            }, err => alert("Please enable Location Services"));
+            });
+        };
+
+        // This button simulates the 0x04 feedback from the ESP32
+        document.getElementById('completeStepBtn').onclick = () => {
+            if (isActionPhase) {
+                completeTurnLogic();
+            } else {
+                // If we aren't in a turn, move the GPS simulation forward
+                triggerTurnSequence();
+            }
         };
     }
 
-    function runNavigationDemo(steps) {
-        let i = 0;
-        const display = document.getElementById('instruction-box');
+    function triggerTurnSequence() {
+        if (stepIndex >= globalSteps.length || isActionPhase) return;
 
-        const processStep = () => {
-            if (i >= steps.length) {
-                display.innerText = "Arrival! You have reached your destination.";
-                return;
+        isActionPhase = true;
+        const step = globalSteps[stepIndex];
+        const instruction = step.instructions.replace(/<[^>]*>?/gm, '');
+
+        updateDisplay(instruction);
+        
+        let cmd = 0x00;
+        const lowerText = instruction.toLowerCase();
+        if (lowerText.includes("left")) cmd = 0x01;
+        else if (lowerText.includes("right")) cmd = 0x02;
+        
+        sendToWristband(cmd);
+        // Note: No timer. Only completeTurnLogic() advances the state.
+    }
+
+    function completeTurnLogic() {
+        if (!isActionPhase) return;
+        
+        console.log("[HAPTIC RECV] Feedback: Turn Finished");
+        isActionPhase = false;
+        stepIndex++;
+        
+        if (stepIndex < globalSteps.length) {
+            updateDisplay("Continue forward");
+            sendToWristband(0x00);
+        } else {
+            updateDisplay("Arrived at destination");
+            sendToWristband(0x00);
+        }
+    }
+
+    function startLiveTracking() {
+        navigator.geolocation.watchPosition((position) => {
+            if (isMockMode || stepIndex >= globalSteps.length || isActionPhase) return;
+
+            const step = globalSteps[stepIndex];
+            const distance = getDistance(
+                position.coords.latitude, position.coords.longitude,
+                step.end_location.lat(), step.end_location.lng()
+            );
+
+            if (distance <= 12) {
+                triggerTurnSequence();
+            } else {
+                updateDisplay("Continue forward");
             }
+        }, null, { enableHighAccuracy: true });
+    }
 
-            const step = steps[i];
-            // 1. Clean the text (Google provides <b>Turn right</b> onto <b>Canal St</b>)
-            const cleanText = step.instructions.replace(/<[^>]*>?/gm, '');
-            const distanceText = step.distance.text; // e.g., "0.2 mi" or "100 ft"
-            const maneuver = step.maneuver || "";
+    function updateDisplay(text) {
+        document.getElementById('instruction-box').innerText = text;
+    }
 
-            // PHASE 1: THE WARNING (Screen reader will announce this immediately)
-            display.innerText = `In ${distanceText}, ${cleanText}`;
-            console.log(`%c[Warning] In ${distanceText}, ${cleanText}`, "color: #f39c12");
-
-            // PHASE 2: THE ACTION (Triggered after a delay to simulate movement)
-            // In a real app, this would trigger when GPS distance < 20 meters
-            setTimeout(() => {
-                display.innerText = `NOW: ${cleanText}`;
-                
-                // Determine Bluetooth Command
-                let cmd = 0x00; // Straight
-                if (maneuver.includes("left")) cmd = 0x01;
-                else if (maneuver.includes("right")) cmd = 0x02;
-
-                sendToWristband(cmd);
-                
-                i++;
-                // Wait a bit before starting the NEXT step's warning
-                setTimeout(processStep, 4000); 
-                
-            }, 5000); // 5 seconds of "walking" between warning and action
-        };
-
-        processStep();
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; 
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
     }
 </script>
-
 </body>
 </html>
