@@ -1,0 +1,313 @@
+Command: C:\Users\mwym2\.espressif\python_env\idf6.0_py3.11_env\Scripts\python.exe c:\esp\v6.0\esp-idf\tools/idf_monitor.py -p COM7 -b 115200 --toolchain-prefix xtensa-esp32s3-elf- --target esp32s3 --revision 0 C:\Projects\NimBLE_GATT_Server\build\nimble_gatt_server.elf C:\Projects\NimBLE_GATT_Server\build\bootloader\bootloader.elf --force-color -m 'C:\Users\mwym2\.espressif\python_env\idf6.0_py3.11_env\Scripts\python.exe' 'c:\esp\v6.0\esp-idf\tools\idf.py' '-p' 'COM7'
+[0;32mI (980) main_task: Calling app_main()[0m
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4200ba3d
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x14f0
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2f58
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.0 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Apr 19 2026 02:13:42[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 8MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (49) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 001f0000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c100020 size=4785ch (292956) map[0m
+[0;32mI (139) esp_image: segment 1: paddr=00057884 vaddr=3fc99700 size=04a60h ( 19040) load[0m
+[0;32mI (143) esp_image: segment 2: paddr=0005c2ec vaddr=40374000 size=03d2ch ( 15660) load[0m
+[0;32mI (147) esp_image: segment 3: paddr=00060020 vaddr=42000020 size=ff934h (1046836) map[0m
+[0;32mI (338) esp_image: segment 4: paddr=0015f95c vaddr=40377d2c size=11910h ( 71952) load[0m
+[0;32mI (354) esp_image: segment 5: paddr=00171274 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (363) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (364) boot: Disabling RNG early entropy source...[0m
+[0;32mI (374) octal_psram: vendor id    : 0x0d (AP)[0m
+[0;32mI (374) octal_psram: dev id       : 0x02 (generation 3)[0m
+[0;32mI (374) octal_psram: density      : 0x03 (64 Mbit)[0m
+[0;32mI (376) octal_psram: good-die     : 0x01 (Pass)[0m
+[0;32mI (380) octal_psram: Latency      : 0x01 (Fixed)[0m
+[0;32mI (385) octal_psram: VCC          : 0x01 (3V)[0m
+[0;32mI (389) octal_psram: SRF          : 0x01 (Fast Refresh)[0m
+[0;32mI (394) octal_psram: BurstType    : 0x01 (Hybrid Wrap)[0m
+[0;32mI (399) octal_psram: BurstLen     : 0x01 (32 Byte)[0m
+[0;32mI (403) octal_psram: Readlatency  : 0x02 (10 cycles@Fixed)[0m
+[0;32mI (408) octal_psram: DriveStrength: 0x00 (1/1)[0m
+[0;32mI (412) MSPI Timing: Enter psram timing tuning[0m
+[0;32mI (417) esp_psram: Found 8MB PSRAM device[0m
+[0;32mI (420) esp_psram: Speed: 80MHz[0m
+[0;32mI (423) cpu_start: Multicore app[0m
+[0;32mI (859) esp_psram: SPI SRAM memory test OK[0m
+[0;32mI (867) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (868) cpu_start: Pro cpu start user code[0m
+[0;32mI (868) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (869) app_init: Application information:[0m
+[0;32mI (873) app_init: Project name:     nimble_gatt_server[0m
+[0;32mI (878) app_init: App version:      1[0m
+[0;32mI (881) app_init: Compile time:     Apr 19 2026 02:27:51[0m
+[0;32mI (886) app_init: ELF file SHA256:  503f56386...[0m
+[0;32mI (891) app_init: ESP-IDF:          v6.0[0m
+[0;32mI (894) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (898) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (902) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (906) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (912) heap_init: At 3FCA0270 len 000494A0 (293 KiB): RAM[0m
+[0;32mI (918) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (923) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (928) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (933) esp_psram: Adding pool of 8192K of PSRAM memory to heap allocator[0m
+[0;32mI (941) spi_flash: detected chip: generic[0m
+[0;32mI (943) spi_flash: flash io: dio[0m
+[0;32mI (947) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (953) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (968) main_task: Started on CPU0[0m
+[0;32mI (978) main_task: Calling app_main()[0m
+[0;32mI (988) BLE_SERVO: MPU WHO_AM_I = 0x68[0m
+[0;32mI (1128) BLE_INIT: BT controller compile version [1bb2f50][0m
+[0;32mI (1128) BLE_INIT: Using main XTAL as clock source[0m
+[0;32mI (1128) BLE_INIT: Feature Config, ADV:1, BLE_50:0, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1[0m
+[0;32mI (1128) BLE_INIT: Bluetooth MAC: dc:b4:d9:0b:fa:52[0m
+[0;32mI (1138) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10[0m
+[0;32mI (1188) NimBLE: GAP procedure initiated: stop advertising.[0m
+
+[0;32mI (1188) NimBLE: GAP procedure initiated: advertise; [0m
+[0;32mI (1188) NimBLE: disc_mode=2[0m
+[0;32mI (1188) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0[0m
+[0;32mI (1198) NimBLE: [0m
+
+[0;32mI (1198) BLE_SERVO: Advertising as 'ESP32S3-Servo'[0m
+BOOT_START
+[0;32mI (1208) MODEL_WRAPPER: Free internal: 254756, largest block: 212992[0m
+[0;32mI (1208) MODEL_WRAPPER: Free SPIRAM:   8385032, largest block: 8257536[0m
+[0;32mI (1228) MODEL_WRAPPER: Input:  name=input size=600 dtype=3 exp=-6[0m
+[0;32mI (1228) MODEL_WRAPPER: Output: name=logits size=2 dtype=3 exp=-4[0m
+[0;32mI (1228) MODEL_WRAPPER: Running model self-test...[0m
+
+[0;32mI (1238) dl::Model: Testing output logits.[0m
+[0;32mI (1238) dl::Model: Test Pass![0m
+[0;32mI (1238) main_task: Returned from app_main()[0m
+[0;32mI (2378) BLE_SERVO: TAP detected[0m
+[0;32mI (2628) BLE_SERVO: TAP detected[0m
+[0;32mI (2878) BLE_SERVO: TAP detected[0m
+[0;32mI (3128) BLE_SERVO: TAP detected[0m
+[0;32mI (3378) BLE_SERVO: TAP detected[0m
+[0;32mI (3628) BLE_SERVO: TAP detected[0m
+[0;32mI (3878) BLE_SERVO: TAP detected[0m
+[0;32mI (4128) BLE_SERVO: TAP detected[0m
+[0;32mI (4378) BLE_SERVO: TAP detected[0m
+[0;32mI (4628) BLE_SERVO: TAP detected[0m
+[0;32mI (4878) BLE_SERVO: TAP detected[0m
+[0;32mI (5128) BLE_SERVO: TAP detected[0m
+[0;32mI (5378) BLE_SERVO: TAP detected[0m
+[0;32mI (5628) BLE_SERVO: TAP detected[0m
+[0;32mI (5878) BLE_SERVO: TAP detected[0m
+[0;32mI (6128) BLE_SERVO: TAP detected[0m
+[0;32mI (6378) BLE_SERVO: TAP detected[0m
+[0;32mI (6628) BLE_SERVO: TAP detected[0m
+[0;32mI (6878) BLE_SERVO: TAP detected[0m
+[0;32mI (7128) BLE_SERVO: TAP detected[0m
+[0;32mI (7378) BLE_SERVO: TAP detected[0m
+[0;32mI (7628) BLE_SERVO: TAP detected[0m
+[0;32mI (7878) BLE_SERVO: TAP detected[0m
+[0;32mI (8128) BLE_SERVO: TAP detected[0m
+[0;32mI (8378) BLE_SERVO: TAP detected[0m
+[0;32mI (8628) BLE_SERVO: TAP detected[0m
+[0;32mI (8878) BLE_SERVO: TAP detected[0m
+[0;32mI (9128) BLE_SERVO: TAP detected[0m
+[0;32mI (9378) BLE_SERVO: TAP detected[0m
+[0;32mI (9628) BLE_SERVO: TAP detected[0m
+[0;32mI (9878) BLE_SERVO: TAP detected[0m
+[0;32mI (10128) BLE_SERVO: TAP detected[0m
+[0;32mI (10378) BLE_SERVO: TAP detected[0m
+[0;32mI (10628) BLE_SERVO: TAP detected[0m
+[0;32mI (10878) BLE_SERVO: TAP detected[0m
+[0;32mI (11128) BLE_SERVO: TAP detected[0m
+[0;32mI (11378) BLE_SERVO: TAP detected[0m
+[0;32mI (11628) BLE_SERVO: TAP detected[0m
+[0;32mI (11878) BLE_SERVO: TAP detected[0m
+[0;32mI (12128) BLE_SERVO: TAP detected[0m
+[0;32mI (12378) BLE_SERVO: TAP detected[0m
+[0;32mI (12628) BLE_SERVO: TAP detected[0m
+[0;32mI (12878) BLE_SERVO: TAP detected[0m
+[0;32mI (13128) BLE_SERVO: TAP detected[0m
+[0;32mI (13378) BLE_SERVO: TAP detected[0m
+[0;32mI (13628) BLE_SERVO: TAP detected[0m
+[0;32mI (13878) BLE_SERVO: TAP detected[0m
+[0;32mI (14128) BLE_SERVO: TAP detected[0m
+[0;32mI (14378) BLE_SERVO: TAP detected[0m
+[0;32mI (14628) BLE_SERVO: TAP detected[0m
+[0;32mI (14878) BLE_SERVO: TAP detected[0m
+[0;32mI (15128) BLE_SERVO: TAP detected[0m
+[0;32mI (15378) BLE_SERVO: TAP detected[0m
+[0;32mI (15628) BLE_SERVO: TAP detected[0m
+[0;32mI (15878) BLE_SERVO: TAP detected[0m
+[0;32mI (16128) BLE_SERVO: TAP detected[0m
+[0;32mI (16378) BLE_SERVO: TAP detected[0m
+[0;32mI (16628) BLE_SERVO: TAP detected[0m
+[0;32mI (16878) BLE_SERVO: TAP detected[0m
+[0;32mI (17128) BLE_SERVO: TAP detected[0m
+[0;32mI (17378) BLE_SERVO: TAP detected[0m
+[0;32mI (17628) BLE_SERVO: TAP detected[0m
+[0;32mI (17878) BLE_SERVO: TAP detected[0m
+[0;32mI (18128) BLE_SERVO: TAP detected[0m
+[0;32mI (18378) BLE_SERVO: TAP detected[0m
+[0;32mI (18628) BLE_SERVO: TAP detected[0m
+[0;32mI (18878) BLE_SERVO: TAP detected[0m
+[0;32mI (338) esp_image: segment 4: paddr=0015f95c vaddr=40377d2c sizeI (864) esp_psram: SPI SRAM memory test OK[0m
+[0;32mI (872) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (873) cpu_start: Pro cpu start user code[0m
+[0;32mI (873) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (874) app_init: Application information:[0m
+[0;32mI (878) app_init: Project name:     nimble_gatt_server[0m
+[0;32mI (883) app_init: App version:      1[0m
+[0;32mI (886) app_init: Compile time:     Apr 19 2026 02:27:51[0m
+[0;32mI (891) app_init: ELF file SHA256:  503f56386...[0m
+[0;32mI (896) app_init: ESP-IDF:          v6.0[0m
+[0;32mI (899) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (903) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (907) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (911) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (917) heap_init: At 3FCA0270 len 000494A0 (293 KiB): RAM[0m
+[0;32mI (923) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (928) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (933) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (938) esp_psram: Adding pool of 8192K of PSRAM memory to heap allocator[0m
+[0;32mI (946) spi_flash: detected chip: generic[0m
+[0;32mI (948) spi_flash: flash io: dio[0m
+[0;32mI (952) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (958) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (973) main_task: Started on CPU0[0m
+[0;32mI (983) main_task: Calling app_main()[0m
+[0;32mI (993) BLE_SERVO: MPU WHO_AM_I = 0x68[0m
+[0;32mI (1133) BLE_INIT: BT controller compile version [1bb2f50][0m
+[0;32mI (1133) BLE_INIT: Using main XTAL as clock source[0m
+[0;32mI (1133) BLE_INIT: Feature Config, ADV:1, BLE_50:0, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1[0m
+[0;32mI (1133) BLE_INIT: Bluetooth MAC: dc:b4:d9:0b:fa:52[0m
+[0;32mI (1143) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10[0m
+[0;32mI (1193) NimBLE: GAP procedure initiated: stop advertising.[0m
+
+[0;32mI (1193) NimBLE: GAP procedure initiated: advertise; [0m
+[0;32mI (1193) NimBLE: disc_mode=2[0m
+[0;32mI (1193) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0[0m
+[0;32mI (1203) NimBLE: [0m
+
+[0;32mI (1213) BLE_SERVO: Advertising as 'ESP32S3-Servo'[0m
+BOOT_START
+[0;32mI (1213) MODEL_WRAPPER: Free internal: 254756, largest block: 212992[0m
+[0;32mI (1223) MODEL_WRAPPER: Free SPIRAM:   8385032, largest block: 8257536[0m
+[0;32mI (1233) MODEL_WRAPPER: Input:  name=input size=600 dtype=3 exp=-6[0m
+[0;32mI (1233) MODEL_WRAPPER: Output: name=logits size=2 dtype=3 exp=-4[0m
+[0;32mI (1233) MODEL_WRAPPER: Running model self-test...[0m
+
+[0;32mI (1243) dl::Model: Testing output logits.[0m
+[0;32mI (1243) dl::Model: Test Pass![0m
+[0;32mI (1253) main_task: Returned from app_main()[0m
+[0;32mI (2383) BLE_SERVO: TAP detected[0m
+[0;32mI (2633) BLE_SERVO: TAP detected[0m
+[0;32mI (2883) BLE_SERVO: TAP detected[0m
+[0;32mI (3133) BLE_SERVO: TAP detected[0m
+[0;32mI (3383) BLE_SERVO: TAP detected[0m
+[0;32mI (3633) BLE_SERVO: TAP detected[0m
+[0;32mI (3883) BLE_SERVO: TAP detected[0m
+[0;32mI (4133) BLE_SERVO: TAP detected[0m
+[0;32mI (4383) BLE_SERVO: TAP detected[0m
+[0;32mI (4633) BLE_SERVO: TAP detected[0m
+[0;32mI (4883) BLE_SERVO: TAP detected[0m
+[0;32mI (5133) BLE_SERVO: TAP detected[0m
+[0;32mI (5383) BLE_SERVO: TAP detected[0m
+[0;32mI (5633) BLE_SERVO: TAP detected[0m
+[0;32mI (5883) BLE_SERVO: TAP detected[0m
+[0;32mI (6133) BLE_SERVO: TAP detected[0m
+[0;32mI (6383) BLE_SERVO: TAP detected[0m
+[0;32mI (6633) BLE_SERVO: TAP detected[0m
+[0;32mI (6883) BLE_SERVO: TAP detected[0m
+[0;32mI (7133) BLE_SERVO: TAP detected[0m
+[0;32mI (7383) BLE_SERVO: TAP detected[0m
+[0;32mI (7633) BLE_SERVO: TAP detected[0m
+[0;32mI (7883) BLE_SERVO: TAP detected[0m
+[0;32mI (8133) BLE_SERVO: TAP detected[0m
+[0;32mI (8383) BLE_SERVO: TAP detected[0m
+[0;32mI (8633) BLE_SERVO: TAP detected[0m
+[0;32mI (8883) BLE_SERVO: TAP detected[0m
+[0;32mI (9133) BLE_SERVO: TAP detected[0m
+[0;32mI (9383) BLE_SERVO: TAP detected[0m
+[0;32mI (9633) BLE_SERVO: TAP detected[0m
+[0;32mI (9883) BLE_SERVO: TAP detected[0m
+[0;32mI (10133) BLE_SERVO: TAP detected[0m
+[0;32mI (10383) BLE_SERVO: TAP detected[0m
+[0;32mI (10633) BLE_SERVO: TAP detected[0m
+[0;32mI (10883) BLE_SERVO: TAP detected[0m
+[0;32mI (11133) BLE_SERVO: TAP detected[0m
+[0;32mI (11383) BLE_SERVO: TAP detected[0m
+[0;32mI (11633) BLE_SERVO: TAP detected[0m
+[0;32mI (11883) BLE_SERVO: TAP detected[0m
+[0;32mI (12133) BLE_SERVO: TAP detected[0m
+[0;32mI (12383) BLE_SERVO: TAP detected[0m
+[0;32mI (12633) BLE_SERVO: TAP detected[0m
+[0;32mI (12883) BLE_SERVO: TAP detected[0m
+[0;32mI (13133) BLE_SERVO: TAP detected[0m
+[0;32mI (13383) BLE_SERVO: TAP detected[0m
+[0;32mI (13633) BLE_SERVO: TAP detected[0m
+[0;32mI (13883) BLE_SERVO: TAP detected[0m
+[0;32mI (14133) BLE_SERVO: TAP detected[0m
+[0;32mI (14383) BLE_SERVO: TAP detected[0m
+[0;32mI (14633) BLE_SERVO: TAP detected[0m
+[0;32mI (14883) BLE_SERVO: TAP detected[0m
+[0;32mI (15133) BLE_SERVO: TAP detected[0m
+[0;32mI (15383) BLE_SERVO: TAP detected[0m
+[0;32mI (15633) BLE_SERVO: TAP detected[0m
+[0;32mI (15883) BLE_SERVO: TAP detected[0m
+[0;32mI (16133) BLE_SERVO: TAP detected[0m
+[0;32mI (16383) BLE_SERVO: TAP detected[0m
+[0;32mI (16633) BLE_SERVO: TAP detected[0m
+[0;32mI (16883) BLE_SERVO: TAP detected[0m
+[0;32mI (17133) BLE_SERVO: TAP detected[0m
+[0;32mI (17383) BLE_SERVO: TAP detected[0m
+[0;32mI (17633) BLE_SERVO: TAP detected[0m
+[0;32mI (17883) BLE_SERVO: TAP detected[0m
+[0;32mI (18133) BLE_SERVO: TAP detected[0m
+[0;32mI (18383) BLE_SERVO: TAP detected[0m
+[0;32mI (18633) BLE_SERVO: TAP detected[0m
+[0;32mI (18883) BLE_SERVO: TAP detected[0m
+[0;32mI (19133) BLE_SERVO: TAP detected[0m
+[0;32mI (19383) BLE_SERVO: TAP detected[0m
+[0;32mI (19633) BLE_SERVO: TAP detected[0m
+[0;32mI (19883) BLE_SERVO: TAP detected[0m
+[0;32mI (20133) BLE_SERVO: TAP detected[0m
+[0;32mI (20383) BLE_SERVO: TAP detected[0m
+[0;32mI (20633) BLE_SERVO: TAP detected[0m
+[0;32mI (20883) BLE_SERVO: TAP detected[0m
+[0;32mI (21133) BLE_SERVO: TAP detected[0m
+[0;32mI (21383) BLE_SERVO: TAP detected[0m
+[0;32mI (21633) BLE_SERVO: TAP detected[0m
+[0;32mI (21883) BLE_SERVO: TAP detected[0m
+[0;32mI (22133) BLE_SERVO: TAP detected[0m
+[0;32mI (22383) BLE_SERVO: TAP detected[0m
+[0;32mI (22633) BLE_SERVO: TAP detected[0m
+[0;32mI (22883) BLE_SERVO: TAP detected[0m
+[0;32mI (23133) BLE_SERVO: TAP detected[0m
+[0;32mI (23383) BLE_SERVO: TAP detected[0m
+[0;32mI (23633) BLE_SERVO: TAP detected[0m
+[0;32mI (23883) BLE_SERVO: TAP detected[0m
+[0;32mI (24133) BLE_SERVO: TAP detected[0m
+[0;32mI (24383) BLE_SERVO: TAP detected[0m
+[0;32mI (24633) BLE_SERVO: TAP detected[0m
+[0;32mI (24883) BLE_SERVO: TAP detected[0m
+[0;32mI (25133) BLE_SERVO: TAP detected[0m
+[0;32mI (25383) BLE_SERVO: TAP detected[0m
+[0;32mI (25633) BLE_SERVO: TAP detected[0m
+[0;32mI (25883) BLE_SERVO: TAP detected[0m
+[0;32mI (26133) BLE_SERVO: TAP detected[0m
+[0;32mI (26383) BLE_SERVO: TAP detected[0m
+[0;32mI (26633) BLE_SERVO: TAP detected[0m

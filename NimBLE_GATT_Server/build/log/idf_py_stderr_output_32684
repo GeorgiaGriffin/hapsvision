@@ -1,0 +1,48 @@
+Command: C:\Users\mwym2\.espressif\python_env\idf6.0_py3.11_env\Scripts\python.exe c:\esp\v6.0\esp-idf\tools/idf_monitor.py -p COM7 -b 115200 --toolchain-prefix xtensa-esp32s3-elf- --target esp32s3 --revision 0 C:\Projects\NimBLE_GATT_Server\build\nimble_gatt_server.elf C:\Projects\NimBLE_GATT_Server\build\bootloader\bootloader.elf --force-color -m 'C:\Users\mwym2\.espressif\python_env\idf6.0_py3.11_env\Scripts\python.exe' 'c:\esp\v6.0\esp-idf\tools\idf.py' '-p' 'COM7'
+[0;33m--- Warning: GDB cannot open serial ports accessed as COMx[0m
+[0;33m--- Using \\.\COM7 instead...[0m
+[0;33m--- esp-idf-monitor 1.9.0 on \\.\COM7 115200[0m
+[0;33m--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H[0m
+[0m--- 0x40048841: [0;33muart_tx_one_char_uart[0m[0m in [0;32mROM[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8908: [0;33mcall_start_cpu0[0m[0m at [0;32mC:/esp/v6.0/esp-idf/components/bootloader/subproject/main/bootloader_start.c[0m[0m:[1;31m27[0m
+[0m--- 0x42061f5e: [0;33mdl::TensorBase::get_size()[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/managed_components/espressif__esp-dl/dl/tensor/include/dl_tensor_base.hpp[0m[0m:[1;31m388[0m
+[0m--- (inlined by) [0;33mdl::TensorBase::assign(dl::TensorBase*)[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/managed_components/espressif__esp-dl/dl/tensor/src/dl_tensor_base.cpp[0m[0m:[1;31m210[0m
+[0m--- 0x40056f5c: [0;33mmemcpy[0m[0m in [0;32mROM[0m
+[0m--- 0x40056f72: [0;33mmemcpy[0m[0m in [0;32mROM[0m
+[0m--- 0x42061f5b: [0;33mdl::TensorBase::assign(dl::TensorBase*)[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/managed_components/espressif__esp-dl/dl/tensor/src/dl_tensor_base.cpp[0m[0m:[1;31m210[0m
+[0m--- 0x42052b74: [0;33mdl::Model::test()[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/managed_components/espressif__esp-dl/dl/model/src/dl_model_base.cpp[0m[0m:[1;31m416[0m
+[0m--- 0x4200f025: [0;33mgesture_model_init[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/main/model_wrapper.cpp[0m[0m:[1;31m37[0m
+[0m--- 0x4200ef3b: [0;33mapp_main[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/main/main.c[0m[0m:[1;31m865[0m
+[0m--- 0x42007d44: [0;33mmain_task[0m[0m at [0;32mC:/esp/v6.0/esp-idf/components/freertos/app_startup.c[0m[0m:[1;31m199[0m
+[0m--- 0x420fcb6a: [0;33mvPortTaskWrapper[0m[0m at [0;32mC:/esp/v6.0/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c[0m[0m:[1;31m143[0m
+[0m--- 0x403831f1: [0;33mesp_restart_noos[0m[0m at [0;32mC:/esp/v6.0/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c[0m[0m:[1;31m165[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8908: [0;33mcall_start_cpu0[0m[0m at [0;32mC:/esp/v6.0/esp-idf/components/bootloader/subproject/main/bootloader_start.c[0m[0m:[1;31m27[0m
+[0m--- 0x42061f5e: [0;33mdl::TensorBase::get_size()[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/managed_components/espressif__esp-dl/dl/tensor/include/dl_tensor_base.hpp[0m[0m:[1;31m388[0m
+[0m--- (inlined by) [0;33mdl::TensorBase::assign(dl::TensorBase*)[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/managed_components/espressif__esp-dl/dl/tensor/src/dl_tensor_base.cpp[0m[0m:[1;31m210[0m
+[0m--- 0x40056f5c: [0;33mmemcpy[0m[0m in [0;32mROM[0m
+[0m--- 0x40056f72: [0;33mmemcpy[0m[0m in [0;32mROM[0m
+[0m--- 0x42061f5b: [0;33mdl::TensorBase::assign(dl::TensorBase*)[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/managed_components/espressif__esp-dl/dl/tensor/src/dl_tensor_base.cpp[0m[0m:[1;31m210[0m
+[0m--- 0x42052b74: [0;33mdl::Model::test()[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/managed_components/espressif__esp-dl/dl/model/src/dl_model_base.cpp[0m[0m:[1;31m416[0m
+[0m--- 0x4200f025: [0;33mgesture_model_init[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/main/model_wrapper.cpp[0m[0m:[1;31m37[0m
+[0m--- 0x4200ef3b: [0;33mapp_main[0m[0m at [0;32mC:/Projects/NimBLE_GATT_Server/main/main.c[0m[0m:[1;31m865[0m
+[0m--- 0x42007d44: [0;33mmain_task[0m[0m at [0;32mC:/esp/v6.0/esp-idf/components/freertos/app_startup.c[0m[0m:[1;31m199[0m
+[0m--- 0x420fcb6a: [0;33mvPortTaskWrapper[0m[0m at [0;32mC:/esp/v6.0/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c[0m[0m:[1;31m143[0m
+[0m--- 0x403831f1: [0;33mesp_restart_noos[0m[0m at [0;32mC:/esp/v6.0/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c[0m[0m:[1;31m165[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0m--- 0x403c8908: [0;33mcall_start_cpu0[0m[0m at [0;32mC:/esp/v6.0/esp-idf/components/bootloader/subproject/main/bootloader_start.c[0m[0m:[1;31m27[0m
+[0;33m--- To exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0m--- 0x403831f1: [0;33mesp_restart_noos[0m[0m at [0;32mC:/esp/v6.0/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c[0m[0m:[1;31m165[0m
+[0m--- 0x403c8700: [0;33m_stext[0m[0m at [0;32m??[0m[0m:[1;31m?[0m
+[0;33m--- To exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0m
+Traceback (most recent call last):
+  File "c:\esp\v6.0\esp-idf\tools/idf_monitor.py", line 11, in <module>
+    sys.exit(subprocess.run([sys.executable, '-m', 'esp_idf_monitor'] + sys.argv[1:]).returncode)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "subprocess.py", line 550, in run
+  File "subprocess.py", line 1199, in communicate
+  File "subprocess.py", line 1262, in wait
+  File "subprocess.py", line 1543, in _wait
+KeyboardInterrupt

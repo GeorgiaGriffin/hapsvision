@@ -1,0 +1,2 @@
+source C:/Projects/NimBLE_GATT_Server/build/bootloader/gdbinit/symbols
+source C:/Projects/NimBLE_GATT_Server/build/bootloader/gdbinit/connect

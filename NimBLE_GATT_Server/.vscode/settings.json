@@ -1,0 +1,16 @@
+{
+  "C_Cpp.intelliSenseEngine": "default",
+  "idf.espIdfPathWin": "c:\\esp\\v6.0\\esp-idf",
+  "idf.toolsPathWin": "C:\\Users\\mwym2\\.espressif",
+  "idf.pythonInstallPath": "C:\\Users\\mwym2\\.espressif\\tools\\idf-python\\3.11.2\\python.exe",
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32s3"
+  },
+  "clangd.path": "C:\\Users\\mwym2\\.espressif\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\bin\\clangd.exe",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=C:\\Users\\mwym2\\.espressif\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32s3-elf-gcc.exe",
+    "--compile-commands-dir=c:\\Projects\\NimBLE_GATT_Server\\build"
+  ],
+  "idf.portWin": "COM7"
+}

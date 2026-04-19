@@ -1,0 +1,9 @@
+Command: cmake -G Ninja -B C:\Projects\NimBLE_GATT_Server\build -DPYTHON_DEPS_CHECKED=1 -DPYTHON=C:\Users\mwym2\.espressif\python_env\idf6.0_py3.11_env\Scripts\python.exe -DESP_PLATFORM=1 -DCCACHE_ENABLE=True C:\Projects\NimBLE_GATT_Server
+Configuration Report               
++---------------------------------+
+|  Parser Version: 1              |
+|  Verbosity: default             |
+|  Defaults policy: sdkconfig     |
+|  Status: Finished successfully  |
+|                                 |
++---------------------------------+
