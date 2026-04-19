@@ -1,0 +1,112 @@
+{
+  "label_map": {
+    "idle": 0,
+    "tap": 1
+  },
+  "window": 100,
+  "stride": 25,
+  "tap_crop": 160,
+  "num_samples": 150,
+  "meta_preview": [
+    {
+      "file": "data\\idle\\idle_20260418_235929.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260418_235929.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260418_235929.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260418_235929.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260418_235929.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260418_235929.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260418_235929.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000004.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000004.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000004.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000004.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000004.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000004.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000004.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000017.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000017.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000017.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000017.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000017.csv",
+      "class": "idle",
+      "session": 0
+    },
+    {
+      "file": "data\\idle\\idle_20260419_000017.csv",
+      "class": "idle",
+      "session": 0
+    }
+  ]
+}
